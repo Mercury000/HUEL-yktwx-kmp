@@ -1,3 +1,5 @@
+> 此仓库用于独立的 Kotlin Multiplatform / iOS 迁移验证。进度和运行方式见 [迁移说明](migration/README.md)，原 Android 项目文件保留用于共享业务逻辑。
+
 <div align="center">
 
 <img src="docs/images/banner.svg" width="100%" alt="财小通 CaiXiaoTong · 校园一卡通 Android 客户端">

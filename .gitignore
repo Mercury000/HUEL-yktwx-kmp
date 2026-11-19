@@ -68,3 +68,11 @@ Desktop.ini
 *.swp
 *.swo
 *.tmp
+
+# Independent migration toolchain sources and generated Xcode project
+/migration/vendor/
+/migration/iosApp/*.xcodeproj/
+/migration/iosApp/Info.plist
+/migration/iosApp/DerivedData/
+/migration/iosApp/*.xcresult/
+/migration/iosApp/screenshots/

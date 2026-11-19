@@ -75,7 +75,6 @@ fun MigrationApp() {
                                 }
                             }) else null,
                             modifier = Modifier.padding(horizontal = 24.dp).testTag("os4-navigation"))
-                        }
                     },
                 ) { padding ->
                     AppearanceBackdropContent {
@@ -115,7 +114,6 @@ fun MigrationApp() {
                             }
                         }
                     }
-                }
                 AppOverlayDialog(show = recharge, title = "本人充值",
                     summary = "仅使用虚构数据，不会发起真实支付", onDismissRequest = { recharge = false }) {
                     AppTextButton("关闭", onClick = { recharge = false }, modifier = Modifier.fillMaxWidth())
@@ -128,6 +126,7 @@ fun MigrationApp() {
                 AppOverlayDialog(show = scanNotice, title = "扫一扫",
                     summary = "相机与扫码识别需要 iOS 平台实现，本阶段仅验证界面", onDismissRequest = { scanNotice = false }) {
                     AppTextButton("关闭", onClick = { scanNotice = false }, modifier = Modifier.fillMaxWidth())
+                }
                 }
             }
         }

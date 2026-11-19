@@ -25,7 +25,11 @@ val prepareUiSources = tasks.register("prepareUiSources") {
         val bars = "@Composable\ninternal fun AppTopAppBar" + appearance
             .substringAfter("@Composable\ninternal fun AppTopAppBar")
             .substringBefore("@Composable\nprivate fun InlineGlassTabs")
-        folder.resolve("OriginalAppearance.kt").writeText(imports + "internal val LocalGlassStyle" + hosts + bars)
+        // beta01 names this zero-radius argument titleBlurRadius; the later
+        // Android snapshot calls it largeTitleBlurRadius. Keep the same value.
+        folder.resolve("OriginalAppearance.kt").writeText(
+            (imports + "internal val LocalGlassStyle" + hosts + bars)
+                .replace("largeTitleBlurRadius =", "titleBlurRadius ="))
         val controls = originalComponents.resolve("AppearanceControls.kt").readText()
             .substringBefore("/** Preserve page cards")
         folder.resolve("OriginalControls.kt").writeText(controls)

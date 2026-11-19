@@ -14,6 +14,7 @@
 - 从 `PaymentPage.kt` 抽取原付款卡片测量代码，使用原 OS4 玻璃导航组件和图标。
 
 业务源码仅将一处 JVM 时钟替换为 Kotlin 公共时钟，测试仅替换 JUnit 入口。
+顶部栏抽取代码将快照的 `largeTitleBlurRadius` 参数名映射为 beta01 的 `titleBlurRadius`，保留原值。
 生成文件在 `build/` 内，不作为第二套源码维护。以后更新上游文件，构建会直接使用更新后的逻辑。
 
 付款正常状态的布局来自上游 `PaymentPage.kt`；相机、支付 SDK、Android bitmap 生成和宿主导航是平台边界。

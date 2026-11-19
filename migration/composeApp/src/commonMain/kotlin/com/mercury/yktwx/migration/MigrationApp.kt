@@ -24,6 +24,14 @@ import org.jetbrains.compose.resources.painterResource
 import top.yukonga.miuix.kmp.basic.*
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Scan
+import top.yukonga.miuix.kmp.icon.glass.Scan as GlassScan
+import top.yukonga.miuix.kmp.icon.glass.GridView as GlassGridView
+import top.yukonga.miuix.kmp.icon.glass.Contacts as GlassContacts
+import top.yukonga.miuix.kmp.glass.GlassNavigationBar
+import top.yukonga.miuix.kmp.glass.GlassNavigationItem
+import top.yukonga.miuix.kmp.glass.GlassIconButton
+import top.yukonga.miuix.kmp.glass.GlassNavigationBarDefaults
+import top.yukonga.miuix.kmp.material.GlassShadows
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.theme.darkColorScheme
 import top.yukonga.miuix.kmp.theme.lightColorScheme
@@ -43,8 +51,8 @@ fun MigrationApp() {
                 Scaffold(
                     topBar = {
                         BlurredBar(topGradient = true) {
-                            TopAppBar(title = selectedTab, actions = {
-                                if (selectedTab == "付款") IconButton(onClick = { scanNotice = true },
+                            AppTopAppBar(title = selectedTab, actions = {
+                                if (selectedTab == "付款") AppIconButton(onClick = { scanNotice = true },
                                     modifier = Modifier.padding(end = 16.dp)) {
                                     Icon(MiuixIcons.Scan, "扫一扫", Modifier.size(24.dp))
                                 }
@@ -52,16 +60,21 @@ fun MigrationApp() {
                         }
                     },
                     bottomBar = {
-                        BlurredBar {
-                            Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
-                                horizontalArrangement = Arrangement.SpaceEvenly) {
-                                listOf("付款", "大厅", "账单", "我的").forEach { tab ->
-                                    TextButton(tab, onClick = { selectedTab = tab },
-                                        modifier = Modifier.weight(1f),
-                                        colors = if (selectedTab == tab) ButtonDefaults.textButtonColorsPrimary()
-                                            else ButtonDefaults.textButtonColors())
+                        val labels = listOf("付款", "大厅", "账单", "我的")
+                        val icons = listOf(AppIcons.PaymentQrCode, MiuixIcons.Glass.GlassGridView,
+                            AppIcons.Bill, MiuixIcons.Glass.GlassContacts)
+                        GlassNavigationBar(items = icons.mapIndexed { index, icon ->
+                            GlassNavigationItem(icon, label = labels[index])
+                        }, selectedIndex = labels.indexOf(selectedTab), onSelect = { selectedTab = labels[it] },
+                            backdrop = LocalBarBlurBackdrop.current,
+                            trailingAction = if (selectedTab == "付款") ({
+                                GlassIconButton(onClick = { scanNotice = true }, backdrop = LocalBarBlurBackdrop.current,
+                                    size = GlassNavigationBarDefaults.Height, shadow = GlassShadows.Float) {
+                                    Icon(MiuixIcons.Glass.GlassScan, "扫一扫", Modifier.size(28.dp),
+                                        tint = MiuixTheme.colorScheme.onSurface)
                                 }
-                            }
+                            }) else null,
+                            modifier = Modifier.padding(horizontal = 24.dp).testTag("os4-navigation"))
                         }
                     },
                 ) { padding ->
@@ -131,13 +144,15 @@ private fun PaymentPreview(onRecharge: () -> Unit, onEnlarge: () -> Unit) {
         Card(Modifier.fillMaxWidth().testTag("payment-code-card"), cornerRadius = 24.dp) {
             Column(Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Row(Modifier.fillMaxWidth().height(32.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth().height(paymentHeaderHeight()), verticalAlignment = Alignment.CenterVertically) {
                     Text("付款码", fontSize = 16.sp, lineHeight = 28.sp, fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.weight(1f))
                     Text("60s 后刷新", fontSize = 12.sp, lineHeight = 16.sp,
                         color = MiuixTheme.colorScheme.onSurfaceVariantSummary)
                 }
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
+                BoxWithConstraints(Modifier.fillMaxWidth()) {
+                Box(Modifier.fillMaxWidth().height(paymentContentHeight(maxWidth)), contentAlignment = Alignment.Center) {
+                Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Box(Modifier.fillMaxWidth().height(88.dp), contentAlignment = Alignment.Center) {
                         Image(painterResource(Res.drawable.demo_barcode), "验证条形码", Modifier.fillMaxSize(),
@@ -150,6 +165,8 @@ private fun PaymentPreview(onRecharge: () -> Unit, onEnlarge: () -> Unit) {
                     PaymentCodeNumber("0000000000000000", isActive = true)
                     Text("向商户出示，切勿分享或截图", Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
                         fontSize = 13.sp, lineHeight = 18.sp, color = MiuixTheme.colorScheme.onSurfaceVariantSummary)
+                }
+                }
                 }
             }
         }

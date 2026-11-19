@@ -5,8 +5,10 @@ plugins {
 }
 
 val originalComponents = rootProject.projectDir.resolve("../app/src/main/java/com/mercury/yktwx/ui/components")
-val prepareUiSources by tasks.registering {
+val originalPaymentPage = originalComponents.parentFile.resolve("pages/PaymentPage.kt")
+val prepareUiSources = tasks.register("prepareUiSources") {
     inputs.files(listOf("BarBlur.kt", "AppIcons.kt", "PaymentCodeNumber.kt", "AppAppearance.kt", "AppearanceControls.kt").map(originalComponents::resolve))
+    inputs.file(originalPaymentPage)
     val destination = layout.buildDirectory.dir("generated/originalUi")
     outputs.dir(destination)
     doLast {
@@ -17,14 +19,31 @@ val prepareUiSources by tasks.registering {
         }
         // Reuse the original glass host/dialog implementation; leave Android shell/navigation outside.
         val appearance = originalComponents.resolve("AppAppearance.kt").readText().replace("\r\n", "\n")
-        val imports = appearance.substringBefore("internal val LocalGlassStyle").lines()
-            .filterNot { it.startsWith("import com.") }.joinToString("\n")
+        val imports = appearance.substringBefore("internal val LocalGlassStyle")
         val hosts = appearance.substringAfter("internal val LocalGlassStyle")
             .substringBefore("@Composable\ninternal fun AppOverlayBottomSheet")
-        folder.resolve("OriginalAppearance.kt").writeText(imports + "internal val LocalGlassStyle" + hosts)
+        val bars = "@Composable\ninternal fun AppTopAppBar" + appearance
+            .substringAfter("@Composable\ninternal fun AppTopAppBar")
+            .substringBefore("@Composable\nprivate fun InlineGlassTabs")
+        folder.resolve("OriginalAppearance.kt").writeText(imports + "internal val LocalGlassStyle" + hosts + bars)
         val controls = originalComponents.resolve("AppearanceControls.kt").readText()
             .substringBefore("/** Preserve page cards")
         folder.resolve("OriginalControls.kt").writeText(controls)
+        val paymentSource = originalPaymentPage.readText().replace("\r\n", "\n")
+        val measurements = paymentSource.substringAfter("/** Reserve the padded status pill")
+            .substringBefore("/** Frozen cards")
+            .replace("private fun payment", "internal fun payment")
+        folder.resolve("OriginalPaymentMeasurements.kt").writeText("""
+            package com.mercury.yktwx.migration
+            import androidx.compose.runtime.*
+            import androidx.compose.ui.platform.LocalDensity
+            import androidx.compose.ui.text.AnnotatedString
+            import androidx.compose.ui.text.TextStyle
+            import androidx.compose.ui.text.rememberTextMeasurer
+            import androidx.compose.ui.text.font.FontWeight
+            import androidx.compose.ui.unit.*
+            /** Reserve the padded status pill$measurements
+        """.trimIndent())
     }
 }
 kotlin {

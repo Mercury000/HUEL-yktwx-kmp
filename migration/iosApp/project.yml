@@ -7,6 +7,7 @@ settings:
   base:
     SWIFT_VERSION: "5.0"
     CODE_SIGNING_ALLOWED: NO
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
 targets:
   CaiXiaoTongMigration:
     type: application
@@ -26,6 +27,12 @@ targets:
     dependencies:
       - framework: ../composeApp/build/bin/iosSimulatorArm64/debugFramework/MigrationApp.framework
         embed: false
+    preBuildScripts:
+      - name: Sync Kotlin framework and Compose resources
+        basedOnDependencyAnalysis: false
+        script: |
+          cd "$SRCROOT/.."
+          ../gradlew -p . :composeApp:embedAndSignAppleFrameworkForXcode --console=plain --no-daemon --max-workers=2 -Pkotlin.compiler.execution.strategy=in-process
   MigrationUITests:
     type: bundle.ui-testing
     platform: iOS

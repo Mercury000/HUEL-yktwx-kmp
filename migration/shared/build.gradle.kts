@@ -1,7 +1,7 @@
 plugins { kotlin("multiplatform") }
 
 val sourceRoot = rootProject.projectDir.resolve("../app/src")
-val prepareSharedSources by tasks.registering(Sync::class) {
+val prepareSharedSources = tasks.register<Sync>("prepareSharedSources") {
     from(sourceRoot.resolve("main/java")) {
         include("**/data/Models.kt", "**/data/ReadFailure.kt", "**/data/NetworkReadAccess.kt", "**/data/ReadController.kt")
         // Keep the original model and all business rules; replace its single JVM clock call.
@@ -9,7 +9,7 @@ val prepareSharedSources by tasks.registering(Sync::class) {
     }
     into(layout.buildDirectory.dir("generated/sharedMain"))
 }
-val prepareSharedTests by tasks.registering(Sync::class) {
+val prepareSharedTests = tasks.register<Sync>("prepareSharedTests") {
     from(sourceRoot.resolve("test/java")) {
         include("**/data/KeyboardEncoderTest.kt", "**/data/ReadGateTest.kt", "**/data/ReadControllerTest.kt")
         filter { line ->

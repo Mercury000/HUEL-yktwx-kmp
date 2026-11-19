@@ -10,13 +10,14 @@
 - `Models.kt`、`ReadFailure.kt`、`NetworkReadAccess.kt`、`ReadController.kt`；
 - 原安全键盘、读取门控和读取生命周期测试转换为 `kotlin.test`，同时运行 JVM / iOS 测试；
 - `BarBlur.kt`、`AppIcons.kt`、`PaymentCodeNumber.kt` 原样复用；
-- 从 `AppAppearance.kt`、`AppearanceControls.kt` 抽取原玻璃宿主和弹窗实现。
+- 从 `AppAppearance.kt`、`AppearanceControls.kt` 抽取原玻璃宿主、顶部栏、按钮和弹窗实现；
+- 从 `PaymentPage.kt` 抽取原付款卡片测量代码，使用原 OS4 玻璃导航组件和图标。
 
 业务源码仅将一处 JVM 时钟替换为 Kotlin 公共时钟，测试仅替换 JUnit 入口。
 生成文件在 `build/` 内，不作为第二套源码维护。以后更新上游文件，构建会直接使用更新后的逻辑。
 
 付款正常状态的布局来自上游 `PaymentPage.kt`；相机、支付 SDK、Android bitmap 生成和宿主导航是平台边界。
-本阶段使用静态虚构码图、简化导航宿主和本地设置页，保留付款卡片的尺寸、间距与字体。
+本阶段使用静态虚构码图、OS4 玻璃导航、简化页面路由和本地设置页，保留付款卡片的尺寸、间距与字体。
 尚未声称整个 UI、动画、字体缩放和系统手势完全一致。
 
 ## 依赖与环境

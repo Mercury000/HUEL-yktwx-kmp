@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +22,6 @@ import com.mercury.yktwx.ui.components.*
 import org.jetbrains.compose.resources.painterResource
 import top.yukonga.miuix.kmp.basic.*
 import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Scan
 import top.yukonga.miuix.kmp.icon.glass.Scan as GlassScan
 import top.yukonga.miuix.kmp.icon.glass.GridView as GlassGridView
 import top.yukonga.miuix.kmp.icon.glass.Contacts as GlassContacts
@@ -38,25 +36,22 @@ import top.yukonga.miuix.kmp.theme.lightColorScheme
 
 /** UI-only probe. There is no account service, permission request or payment SDK in this app. */
 @Composable
-fun MigrationApp() {
+fun MigrationApp(onDarkModeChanged: (Boolean) -> Unit = {}) {
     var dark by remember { mutableStateOf(false) }
     var glass by remember { mutableStateOf(true) }
     var selectedTab by remember { mutableStateOf("付款") }
     var recharge by remember { mutableStateOf(false) }
     var enlarged by remember { mutableStateOf(false) }
     var scanNotice by remember { mutableStateOf(false) }
+    LaunchedEffect(dark) { onDarkModeChanged(dark) }
     MiuixTheme(colors = if (dark) darkColorScheme() else lightColorScheme()) {
         AppAppearanceHost(glassStyle = glass) {
             BarBlurHost(bottomBarBlurEnabled = true, topBarBlurEnabled = true) {
                 Scaffold(
                     topBar = {
                         BlurredBar(topGradient = true) {
-                            AppTopAppBar(title = selectedTab, actions = {
-                                if (selectedTab == "付款") AppIconButton(onClick = { scanNotice = true },
-                                    modifier = Modifier.padding(end = 16.dp)) {
-                                    Icon(MiuixIcons.Scan, "扫一扫", Modifier.size(24.dp))
-                                }
-                            })
+                            // The original phone layout puts scanning in the floating bottom bar.
+                            AppTopAppBar(title = selectedTab, color = Color.Transparent)
                         }
                     },
                     bottomBar = {
@@ -179,7 +174,7 @@ private fun PaymentPreview(onRecharge: () -> Unit, onEnlarge: () -> Unit) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text("¥ ", fontSize = 30.sp, fontWeight = FontWeight.SemiBold)
                     Text("128.50", Modifier.weight(1f), fontSize = 30.sp, fontWeight = FontWeight.SemiBold)
-                    TextButton("充值", onClick = onRecharge)
+                    CompactButton("充值", onClick = onRecharge)
                 }
             }
         }

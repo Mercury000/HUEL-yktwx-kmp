@@ -12,6 +12,7 @@
 - `BarBlur.kt`、`AppIcons.kt`、`PaymentCodeNumber.kt` 原样复用；
 - 从 `AppAppearance.kt`、`AppearanceControls.kt` 抽取原玻璃宿主、顶部栏、按钮和弹窗实现；
 - 从 `PaymentPage.kt` 抽取原付款卡片测量代码，使用原 OS4 玻璃导航组件和图标。
+- 复用原 `CompactButton` 的尺寸、颜色与字体，Android 自定义按压反馈边界使用公共 Indication。
 
 业务源码仅将一处 JVM 时钟替换为 Kotlin 公共时钟，测试仅替换 JUnit 入口。
 beta01 的 `BlurTopAppBar` 是内部 API。验证宿主的导航标题透明度固定为 1，因此将其零模糊降级分支映射为公开的 `TopAppBar`；原玻璃顶部栏分支保持原样。
@@ -19,6 +20,7 @@ beta01 的 `BlurTopAppBar` 是内部 API。验证宿主的导航标题透明度�
 
 付款正常状态的布局来自上游 `PaymentPage.kt`；相机、支付 SDK、Android bitmap 生成和宿主导航是平台边界。
 本阶段使用静态虚构码图、OS4 玻璃导航、简化页面路由和本地设置页，保留付款卡片的尺寸、间距与字体。
+手机悬浮导航模式下仅保留底部扫码入口，与原 `YktApp.kt` 的显示策略一致。
 尚未声称整个 UI、动画、字体缩放和系统手势完全一致。
 
 ## 依赖与环境
@@ -53,6 +55,7 @@ beta01 的 `BlurTopAppBar` 是内部 API。验证宿主的导航标题透明度�
 - QR 内容是 `example.invalid`，条形码包含 `DEMO`，均不可用于付款。
 - 还没有迁移真实扫码、支付宝/银联、Keystore/Keychain、付款码生命周期和截图监听。
 - 原模糊代码保留能力检测和降级逻辑；截图需要确认模拟器实际渲染结果。
+- iOS 的界面深色模式同时更新 UIKit 窗口样式，使系统栏和原组件的模式判断保持一致。
 - 鸿蒙尚未加入本阶段构建目标，需在 iOS 基础验证后另选支持鸿蒙的工具链。
 
 ## 合并策略

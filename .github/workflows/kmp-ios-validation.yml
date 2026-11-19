@@ -24,10 +24,12 @@ jobs:
           distribution: zulu
           java-version: '21'
       - uses: gradle/actions/setup-gradle@v6
-      - uses: actions/cache@v6
+      - uses: actions/cache/restore@v6
+        id: native-cache
         with:
           path: ~/.konan
-          key: ${{ runner.os }}-kotlin-native-v2.4.21
+          key: ${{ runner.os }}-kotlin-native-ui-v2.4.21
+          restore-keys: ${{ runner.os }}-kotlin-native-v2.4.21
       - name: Run shared JVM and iOS tests
         run: |
           chmod +x gradlew
@@ -36,6 +38,11 @@ jobs:
         run: |
           xcrun simctl shutdown all
           ./gradlew -p migration :composeApp:linkDebugFrameworkIosSimulatorArm64 --console=plain --no-daemon --max-workers=2 -Pkotlin.compiler.execution.strategy=in-process
+      - uses: actions/cache/save@v6
+        if: steps.native-cache.outputs.cache-hit != 'true'
+        with:
+          path: ~/.konan
+          key: ${{ steps.native-cache.outputs.cache-primary-key }}
       - name: Prepare Xcode simulator app
         run: |
           if ! command -v xcodegen >/dev/null; then brew install xcodegen; fi

@@ -7,7 +7,7 @@ plugins {
 val originalComponents = rootProject.projectDir.resolve("../app/src/main/java/com/mercury/yktwx/ui/components")
 val originalPaymentPage = originalComponents.parentFile.resolve("pages/PaymentPage.kt")
 val prepareUiSources = tasks.register("prepareUiSources") {
-    inputs.files(listOf("BarBlur.kt", "AppIcons.kt", "PaymentCodeNumber.kt", "AppAppearance.kt", "AppearanceControls.kt").map(originalComponents::resolve))
+    inputs.files(listOf("BarBlur.kt", "AppIcons.kt", "PaymentCodeNumber.kt", "AppAppearance.kt", "AppearanceControls.kt", "DashboardComponents.kt").map(originalComponents::resolve))
     inputs.file(originalPaymentPage)
     val destination = layout.buildDirectory.dir("generated/originalUi")
     outputs.dir(destination)
@@ -35,6 +35,29 @@ val prepareUiSources = tasks.register("prepareUiSources") {
         val controls = originalComponents.resolve("AppearanceControls.kt").readText()
             .substringBefore("/** Preserve page cards")
         folder.resolve("OriginalControls.kt").writeText(controls)
+        val dashboard = originalComponents.resolve("DashboardComponents.kt").readText().replace("\r\n", "\n")
+        val compactButton = "@Composable\ninternal fun CompactButton" + dashboard
+            .substringAfter("@Composable\ninternal fun CompactButton")
+            .substringBefore("@Composable\ninternal fun DashboardLink")
+            .replace("indication = rememberPressFeedback(color = textColor),", "indication = LocalIndication.current,")
+        folder.resolve("OriginalCompactButton.kt").writeText("""
+            package com.mercury.yktwx.ui.components
+            import androidx.compose.foundation.isSystemInDarkTheme
+            import androidx.compose.foundation.LocalIndication
+            import androidx.compose.foundation.layout.PaddingValues
+            import androidx.compose.runtime.Composable
+            import androidx.compose.ui.Modifier
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.text.TextStyle
+            import androidx.compose.ui.text.font.FontWeight
+            import androidx.compose.ui.unit.dp
+            import androidx.compose.ui.unit.sp
+            import top.yukonga.miuix.kmp.basic.ButtonDefaults
+            import top.yukonga.miuix.kmp.glass.GlassDialogButtonDefaults
+            import top.yukonga.miuix.kmp.theme.MiuixTheme
+            import com.mercury.yktwx.ui.components.AppTextButton as TextButton
+            $compactButton
+        """.trimIndent())
         val paymentSource = originalPaymentPage.readText().replace("\r\n", "\n")
         val measurements = paymentSource.substringAfter("/** Reserve the padded status pill")
             .substringBefore("/** Frozen cards")

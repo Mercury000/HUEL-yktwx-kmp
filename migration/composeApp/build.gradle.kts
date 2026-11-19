@@ -49,7 +49,7 @@ kotlin {
                 implementation("top.yukonga.miuix.kmp:miuix-$it:0.9.5-beta01")
             }
         }
-        desktopMain.dependencies { implementation(compose.desktop.currentOs) }
+        named("desktopMain") { dependencies { implementation(compose.desktop.currentOs) } }
     }
 }
 compose.desktop { application { mainClass = "com.mercury.yktwx.migration.DesktopMainKt" } }

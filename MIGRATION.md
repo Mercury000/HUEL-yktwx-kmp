@@ -4,6 +4,7 @@
 原 Android 工程仍在根目录；独立 KMP 工程位于 `migration/`，不改变 Android 构建配置。
 
 运行与验证说明见 [migration/README.md](migration/README.md)。
+本轮结果与模拟器截图见 [验证记录](docs/migration-validation.md)。
 
 原有 Android 发布、更新和网站工作流在此仓库改为 `.disabled` 后缀，避免触发原项目发布流程。
 迁移验证仅运行 `.github/workflows/kmp-ios-validation.yml`。

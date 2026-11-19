@@ -28,10 +28,14 @@ jobs:
         with:
           path: ~/.konan
           key: ${{ runner.os }}-kotlin-native-v2.4.21
-      - name: Compile shared logic and original UI for iOS
+      - name: Run shared JVM and iOS tests
         run: |
           chmod +x gradlew
-          ./gradlew -p migration :shared:desktopTest :shared:iosSimulatorArm64Test :composeApp:linkDebugFrameworkIosSimulatorArm64 --console=plain --no-daemon --max-workers=2 -Pkotlin.compiler.execution.strategy=in-process
+          ./gradlew -p migration :shared:desktopTest :shared:iosSimulatorArm64Test --console=plain --no-daemon --max-workers=2 -Pkotlin.compiler.execution.strategy=in-process
+      - name: Compile original UI for iOS
+        run: |
+          xcrun simctl shutdown all
+          ./gradlew -p migration :composeApp:linkDebugFrameworkIosSimulatorArm64 --console=plain --no-daemon --max-workers=2 -Pkotlin.compiler.execution.strategy=in-process
       - name: Prepare Xcode simulator app
         run: |
           if ! command -v xcodegen >/dev/null; then brew install xcodegen; fi

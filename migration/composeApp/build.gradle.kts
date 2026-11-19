@@ -25,11 +25,13 @@ val prepareUiSources = tasks.register("prepareUiSources") {
         val bars = "@Composable\ninternal fun AppTopAppBar" + appearance
             .substringAfter("@Composable\ninternal fun AppTopAppBar")
             .substringBefore("@Composable\nprivate fun InlineGlassTabs")
-        // beta01 names this zero-radius argument titleBlurRadius; the later
-        // Android snapshot calls it largeTitleBlurRadius. Keep the same value.
-        folder.resolve("OriginalAppearance.kt").writeText(
-            (imports + "internal val LocalGlassStyle" + hosts + bars)
-                .replace("largeTitleBlurRadius =", "titleBlurRadius ="))
+        // beta01 keeps BlurTopAppBar internal. The probe's navigation alpha is
+        // always 1, so its zero-blur fallback can use the public TopAppBar.
+        // The original GlassTopAppBar branch stays unchanged.
+        val portableBars = bars
+            .replace("BlurTopAppBar(title = title, largeTitleBlurRadius = 0.dp,", "TopAppBar(title = title,")
+            .replace("titleAlpha = navigationTitleAlpha, bottomContent = bottomContent)", "bottomContent = bottomContent)")
+        folder.resolve("OriginalAppearance.kt").writeText(imports + "internal val LocalGlassStyle" + hosts + portableBars)
         val controls = originalComponents.resolve("AppearanceControls.kt").readText()
             .substringBefore("/** Preserve page cards")
         folder.resolve("OriginalControls.kt").writeText(controls)
